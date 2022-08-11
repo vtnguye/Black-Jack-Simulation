@@ -1,0 +1,90 @@
+---
+title: "Final_Exam"
+author: "Vy Nguyen"
+date: "4/27/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(TSA)
+library(tseries)
+```
+
+## 1
+a. For ARIMA(0,1,1), we should perform ARIMA(1,1,1) and ARIMA(0,1,2)
+b. 
+c. IMA(1,1) with $\theta$ = 0.6
+d. $\hat{Y}_t(2) = \mu + \phi^2 (Y_t - \mu)$  
+$\hat{Y}_t(2) = 0 + 0.6^2(Y_{100} - 0)$  
+$\hat{Y}_t(2) = 0.72$
+e. False????????
+f. ADF p-value 0.7 means do not reject null hypothesis, therefore we take difference. the ACF for the series has a very slow decay, and the PACF for the difference series has significant spikes at lags 1 and 2 means that AR(2) model would be most consistent with the findings.
+Therefore, we choose ARIMA(2,1,0)
+g. True
+
+## 2
+a. The  fitted model :
+$logY_t = logY_{t-1} + e_t + 0.2956e_{t-1}$
+b.  ML estimate $\hat{\theta}$ = -0.2956 is significantly different
+from 0 since the approximate 95 percent confidence interval is (-0.2956−1.96∗0.0693, -0.2956+1.96∗0.0693) = (−0.431428, −0.159772).
+c. The figure on the RIGHT may correspond to MMSE forecast and 95%
+prediction intervals according to your model in (a).
+Since we fit IMA(1,1) model to the data, we assume that the original data is non-stationary, and as expected from a nonstationary process, the estimated standard errors (also on the log scale) increase
+as l increases.
+d. MMSE forecast on the original scale is $e^{5+1/2*0.2^2}$ = 151.411
+The 95 percent confidence interval of the log-scale is (4.608,5.392)
+Therefore 95 percent confidence interval of the original forecast:
+($e^{4.608}$,$e^{5.392}$) = (100.283,219.642)
+
+## 3
+```{r}
+ts2022 = as.ts(read.table(file = "ts2022.txt"))
+```
+
+```{r}
+ts.plot(ts2022, type="o", main="TS 2022", ylab="Unit", xlab="Time")
+```
+```{r}
+acf(ts2022,main="Sample ACF")
+```
+```{r}
+adf.test(ts2022)
+```
+a. The process in the plot does not assemble a stationary process. Also, the sample ACF decays slowly every 5 lags, which also indicates that the process is not stationary.The p-value of the ADF test is greater than 0.05, so we fail to reject the null hypothesis, which states that the process is not stationary.
+b. 
+```{r}
+par(mfrow=c(1,2))
+plot(diff(ts2022),ylab="First Difference of Gasoline Prices",xlab="Time",type="o")
+acf(diff(ts2022),main="Sample ACF")
+```
+
+```{r}
+adf.test(diff(ts2022))
+```
+For the first differences of ts2022 data, the time series plot looks like a mean zero white noise process. The p-value of the ADF test is smaller than 0.01, so we reject the null hypothesis and we claim that there is sufficient evidence to support that the process is stationary.
+```{r}
+pacf(diff(ts2022),main="Sample PACF")
+```
+```{r}
+eacf(diff(ts2022))
+```
+The sample ACF suggests that we should use MA(3)
+The EACF suggest we should use ARMA(0,3) or ARMA(2,1)
+Therefore, ARIMA(0,1,3) or ARIMA(0,1,1) will be a candidate model for the dataset.
+c.
+We will fit ARIMA(0,1,3)
+```{r}
+arima(ts2022,order=c(2,1,1),method="ML")
+```
+
+The 95% CI for $\hat{\theta}_1$ = (−0.146,0.057) which is not significantly different from zero, therefore we have to try another model.
+We will fit ARIMA(0,1,1)
+
+```{r}
+arima(ts2022,order=c(2,1,1),method="ML")
+```
+
+
+
+
